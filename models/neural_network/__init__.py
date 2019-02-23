@@ -51,14 +51,10 @@ class NeuralNetwork(models.Model):
         return pred_values[:, 0], pred_values[:, 1]
             
         
-    def load(self, version=None):
-        if version is None:
-            version = self.latest_version()
-        
-        if version is None:
-            return
-            
+    def load(self, version='default'):
         output_path = self.model_data_path(version)
+        if not os.path.exists(output_path):
+            return
         
         self.neural_network = keras.models.load_model(output_path + '/neural_network.h5')
 

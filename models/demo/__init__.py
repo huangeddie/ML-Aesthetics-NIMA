@@ -39,14 +39,10 @@ class LinearModel(models.Model):
         return pred_scores, pred_stds
             
         
-    def load(self, version=None):
-        if version is None:
-            version = self.latest_version()
-        
-        if version is None:
-            return
-            
+    def load(self, version='default'):
         output_path = self.model_data_path(version)
+        if not os.path.exists(output_path):
+            return
         
         with open(output_path + '/score_regression', 'rb') as f:
             self.score_reg = pickle.load(f)

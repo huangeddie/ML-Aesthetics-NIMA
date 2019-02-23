@@ -16,7 +16,7 @@ class Model:
         raise Exception('Not Implemented')
     
     
-    def load(self, version=None):
+    def load(self, version_name='default'):
         """
         Load model from version history
         :param version: index of the version to load, or None to load the most recent
@@ -24,7 +24,7 @@ class Model:
         raise Exception('Not Implemented')
     
     
-    def train(self):
+    def train(self, epochs=None):
         """
         Train model
         """
@@ -38,45 +38,21 @@ class Model:
         raise Exception('Not Implemented')
         
         
-    def version_path(self, version):
-        return 'models/{}/versions/{}/'.format(self.dir_name, version)
+    def version_path(self, name):
+        return 'models/{}/versions/{}/'.format(self.dir_name, name)
     
-    def model_data_path(self, version):
-        return self.version_path(version) + '/model_data/'
-        
-    def latest_version(self):
-        """
-        :return : None if there was no previous version, index otherwise
-        """
-        file_path = 'models/{}/versions'.format(self.dir_name)
-        if not os.path.exists(file_path):
-            os.makedirs(file_path)
-        version_list = os.listdir(file_path)
-        version_list = list(filter(lambda path: "." not in path, version_list))
-        version_list = list(map(lambda idx: int(idx), version_list))
-        
-        if len(version_list) == 0:
-            return None
-        
-        ret = np.max(version_list)
-        return ret
-        
-    def new_version(self):
-        latest_ver = self.latest_version()
-        
-        if latest_ver is None:
-            return 1
-        
-        ret = latest_ver + 1
-        return ret
+    def model_data_path(self, name):
+        return self.version_path(name) + '/model_data/'
     
-    def checkpoint(self, version=None):
+    def checkpoint(self, name=None):
         """
         Evaluate the model with testing data, save the model to version history,
         and save the stats of this evaluation into the stats folder of that model.
         :param version: index of the version to save to, or None to create a new version
         :return : version index
         """
+        print("Creating checkpoint...")
+        
         df = pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
         test_df = df[df['subset'] == 'test']
         
@@ -84,17 +60,15 @@ class Model:
         
         pred_scores, pred_stds = self.predict(imgs)
         
-        
-        # Create a new version folder if version is None
-        if version is None:
-            version = self.new_version()
-            os.makedirs(self.version_path(version) + '/model_data')
-            os.makedirs(self.version_path(version) + '/stats')
+        name = 'default' if name is None else name
         
         # Save the statistics as a graph into stats folder
         plt.figure(figsize=(10, 5))
         
         score_corr = pearsonr(pred_scores, test_scores)[0]
+        std_corr = pearsonr(pred_stds, test_stds)[0]
+        
+        print('Score Corr: {} | STD Corr: {}'.format(score_corr, std_corr))
         
         plt.subplot(1, 2, 1)
         plt.title('Scores with correlation {}'.format(round(score_corr, 3)))
@@ -102,22 +76,27 @@ class Model:
         plt.ylabel('Truth')
         plt.scatter(pred_scores, test_scores)
         
-        std_corr = pearsonr(pred_stds, test_stds)[0]
-        
         plt.subplot(1, 2, 2)
         plt.title('STDs with correlation {}'.format(round(std_corr,3)))
         plt.xlabel('Predicted')
         plt.ylabel('Truth')
         plt.scatter(pred_stds, test_stds)
         
-        plt.savefig(self.version_path(version) + '/stats/stats.png'.format(self.dir_name, version))
+        stats_path = self.version_path(name) + '/stats/'.format(self.dir_name, name)
+        if not os.path.exists(stats_path):
+            os.makedirs(stats_path)
+        plt.savefig(stats_path + 'stats.png')
         
-        # Save the model into this version folder
-        output_path = self.version_path(version)
+        # Save the model into this name folder
+        output_path = self.version_path(name)
         output_path += '/model_data/'
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+            
         self._save(output_path)
         
-        return version
+        print('Saved {} to version {}'.format(self.__class__.__name__, version))
+
     
     
     def _save(self, output_path):
@@ -151,3 +130,5 @@ class Model:
         img_paths = list(map(lambda id: img_folder_path + str(id) + ".png", df["id"].values))
         list_of_images = list(skimage.io.imread_collection(img_paths))
         return list_of_images, df['norm_score'], df['norm_std']
+    
+    
