@@ -1,0 +1,78 @@
+import yaml
+import os
+import sklearn.mixture as mixture
+import pandas as pd
+import numpy as np
+import models
+import pickle
+import keras
+
+class LinearModel(models.Model):
+    def __init__(self):
+        stream = open("models/demo/config.yml", "r")
+        config = yaml.load(stream)
+        
+        self.dim = int(config['dim'])
+        self.img_class = config['img_class']
+        self.dir_name = "vector_quantization"
+        self.num_of_cluster = 64
+        self.cluster_gm = mixture.GaussianMixture(n_components=self.num_of_cluster)
+        self.neural_network = keras.models.Sequential([
+            keras.layers.Dense(int(self.num_of_cluster * 1.5), input_shape=self.num_of_cluster,
+            keras.layers.Activation('relu'),
+            keras.layers.Dense(2),
+        ])
+        
+    
+    def train(self):
+        df = pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
+        
+        train_df = df[df['subset'] == 'train']
+        
+        train_imgs, train_scores, train_std = self.load_data(train_df)
+                
+        train_imgs = np.array(train_imgs).reshape(len(train_imgs), (self.dim ** 2)*3)
+        
+        self.score_reg.fit(train_imgs, train_scores)
+        self.std_reg.fit(train_imgs, train_scores)
+        
+    def predict(self, imgs):
+        imgs = np.array(imgs).reshape(len(imgs), (self.dim ** 2)*3)
+        
+        pred_scores = self.score_reg.predict(imgs)
+        pred_stds = self.std_reg.predict(imgs)
+        
+        return pred_scores, pred_stds
+            
+        
+    def load(self, version=None):
+        if version is None:
+            version = self.latest_version()
+        
+        if version is None:
+            return
+            
+        output_path = self.model_data_path(version)
+        
+        with open(output_path + '/score_regression', 'rb') as f:
+            self.score_reg = pickle.load(f)
+            
+        with open(output_path + '/std_regression', 'rb') as f:
+            self.std_reg = pickle.load(f)
+
+        
+    def _save(self, output_path):
+        score_s = pickle.dumps(self.score_reg)
+        std_s = pickle.dumps(self.std_reg)
+        
+        with open(output_path + '/score_regression', 'wb') as f:
+            f.write(score_s)
+            
+        with open(output_path + '/std_regression', 'wb') as f:
+            f.write(std_s)
+        
+        
+        
+        
+        
+

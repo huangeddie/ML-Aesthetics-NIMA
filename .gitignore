@@ -1,0 +1,7 @@
+**/.ipynb_checkpoints/**
+**/__pycache__/**
+**.png
+**.jpg
+models/*/versions/**
+processed_data/**
+raw_data/AVA_dataset/images/**
