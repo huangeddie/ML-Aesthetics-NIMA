@@ -111,7 +111,7 @@ class Model:
         
         raise Exception('Not implemented')
     
-    def _clean_df(df):
+    def _clean_df(self, df):
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
         bad_row_idcs = []
         for i, row in df.iterrows():
