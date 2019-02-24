@@ -17,8 +17,10 @@ model_name = args.model
 
 # Do stuff
 Model = eval(model_name)
+print('Training {}'.format(Model.__name__))
 
 model = Model()
-model.load()
+print('Loading {}'.format(vers_name))
+model.load(vers_name)
 model.train(epochs)
 model.checkpoint(vers_name)

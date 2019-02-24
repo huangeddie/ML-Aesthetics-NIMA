@@ -43,7 +43,8 @@ class NeuralNetwork(models.Model):
         self.neural_network.fit(train_imgs, values, epochs=10, batch_size=32)
         
         
-    def predict(self, imgs):
+    def predict(self, df):
+        imgs, _ , _ = self.load_data(df)
         imgs = np.array(imgs).reshape(len(imgs), (self.dim ** 2)*3)
         
         pred_values = self.neural_network.predict(imgs)

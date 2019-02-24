@@ -80,7 +80,9 @@ class VQModel(models.Model):
         return feature_vectors
         
         
-    def predict(self, imgs):
+    def predict(self, df):
+        imgs, _ , _ = self.load_data(df)
+        
         quantized_chuncks = self._quantize_imgs(imgs, self.vq_dim)
         chunck_labels = self.cluster_gm.predict(quantized_chuncks)
         feature_vectors = self._build_feature_vectors(chunck_labels, len(imgs))

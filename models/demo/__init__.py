@@ -30,7 +30,8 @@ class LinearModel(models.Model):
         self.score_reg.fit(train_imgs, train_scores)
         self.std_reg.fit(train_imgs, train_scores)
         
-    def predict(self, imgs):
+    def predict(self, df):
+        imgs, _ , _ = self.load_data(df)
         imgs = np.array(imgs).reshape(len(imgs), (self.dim ** 2)*3)
         
         pred_scores = self.score_reg.predict(imgs)

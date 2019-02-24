@@ -61,10 +61,14 @@ class DenseNet(models.Model):
                             epochs=epochs)
         
         
-    def predict(self, imgs):
-        imgs = np.array(imgs)
+    def predict(self, df):
+        datagen=ImageDataGenerator(rescale=1./255)
+        img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
+        generator=datagen.flow_from_dataframe(dataframe=df, directory=img_folder_path, 
+                                                    x_col="file_name", y_col=['norm_score', 'norm_std'],
+                                                    class_mode="other", target_size=(256,256), batch_size=32)
         
-        pred_values = self.model.predict(imgs)
+        pred_values = self.model.predict_generator(generator=generator)
         
         return pred_values[:, 0], pred_values[:, 1]
             

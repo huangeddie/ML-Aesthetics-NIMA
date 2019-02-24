@@ -31,7 +31,7 @@ class Model:
         raise Exception('Not Implemented')
     
     
-    def predict(self, imgs):
+    def predict(self, df):
         """
         :return: the predicted normalized scores and normalized stds
         """
@@ -55,10 +55,12 @@ class Model:
         
         df = pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
         test_df = df[df['subset'] == 'test']
+        test_df = self._clean_df(test_df)
         
-        imgs, test_scores, test_stds = self.load_data(test_df)
+        test_scores = test_df['norm_score']
+        test_stds = test_df['norm_std']
         
-        pred_scores, pred_stds = self.predict(imgs)
+        pred_scores, pred_stds = self.predict(test_df)
         
         name = 'default' if name is None else name
         
@@ -88,6 +90,7 @@ class Model:
         plt.savefig(stats_path + 'stats.png')
         
         # Save the model into this name folder
+        print('Saving model...')
         output_path = self.version_path(name)
         output_path += '/model_data/'
         if not os.path.exists(output_path):
@@ -108,14 +111,7 @@ class Model:
         
         raise Exception('Not implemented')
     
-    
-    def load_data(self, df):
-        """
-        Load images based on meta data df passed in
-        Ignores rows with missing images
-        """
-        
-        # Clean df
+    def _clean_df(df):
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
         bad_row_idcs = []
         for i, row in df.iterrows():
@@ -124,6 +120,17 @@ class Model:
                 bad_row_idcs.append(i)
         
         df = df.drop(bad_row_idcs)
+        
+        return df
+    
+    def load_data(self, df):
+        """
+        Load images based on meta data df passed in
+        Ignores rows with missing images
+        """
+        
+        # Clean df
+        df = self._clean_df(df)
         
         # Load images
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
