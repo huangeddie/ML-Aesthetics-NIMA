@@ -57,8 +57,8 @@ class Model:
         test_df = df[df['subset'] == 'test']
         test_df = self._clean_df(test_df)
         
-        test_scores = test_df['norm_score']
-        test_stds = test_df['norm_std']
+        test_scores = test_df['score']
+        test_stds = test_df['std']
         
         pred_scores, pred_stds = self.predict(test_df)
         
@@ -98,7 +98,7 @@ class Model:
             
         self._save(output_path)
         
-        print('Saved {} to version {}'.format(self.__class__.__name__, version))
+        print('Saved {} to version {}'.format(self.__class__.__name__, name))
 
     
     
@@ -119,7 +119,7 @@ class Model:
             if not os.path.exists('{}/{}.png'.format(img_folder_path, image_id)):
                 bad_row_idcs.append(i)
         
-        df = df.drop(bad_row_idcs)
+        df = df.drop(bad_row_idcs).reset_index()
         
         return df
     

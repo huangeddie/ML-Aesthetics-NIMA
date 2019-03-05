@@ -16,6 +16,8 @@ from keras.layers import Dense, GlobalAveragePooling2D
 from keras import backend as K
 from keras.layers import Input
 
+import pdb
+
 class DenseNet(models.Model):
     def __init__(self):
         stream = open("models/densenet/config.yml", "r")
@@ -29,12 +31,12 @@ class DenseNet(models.Model):
         input_tensor = Input(shape=(self.dim, self.dim, 3))
         
         base_model = DenseNet121(input_tensor=input_tensor, weights='imagenet', include_top=False)
-
+        base_model.layers.pop()
         # add a global spatial average pooling layer
-        x = base_model.output
+        x = base_model.layers[-1].output
         x = GlobalAveragePooling2D()(x)
         # let's add a fully-connected layer
-        x = Dense(1024, activation='relu')(x)
+        x = Dense(10, activation='relu')(x)
         # and a logistic layer -- let's say we have 200 classes
         predictions = Dense(2)(x)
 
@@ -47,11 +49,13 @@ class DenseNet(models.Model):
         
         train_df = df[df['subset'] == 'train']
         
+        train_df = self._clean_df(train_df)
+        
         datagen=ImageDataGenerator(rescale=1./255)
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
         train_generator=datagen.flow_from_dataframe(dataframe=train_df, directory=img_folder_path, 
-                                                    x_col="file_name", y_col=['norm_score', 'norm_std'],
-                                                    class_mode="other", target_size=(256,256), batch_size=32)
+                                                    x_col="file_name", y_col=['score', 'std'],
+                                                    class_mode="other", target_size=(self.dim, self.dim), batch_size=32)
         
         STEP_SIZE_TRAIN=train_generator.n//train_generator.batch_size
         
@@ -61,14 +65,15 @@ class DenseNet(models.Model):
                             epochs=epochs)
         
         
-    def predict(self, df):
+    def predict(self, df):        
         datagen=ImageDataGenerator(rescale=1./255)
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
-        generator=datagen.flow_from_dataframe(dataframe=df, directory=img_folder_path, 
-                                                    x_col="file_name", y_col=['norm_score', 'norm_std'],
-                                                    class_mode="other", target_size=(256,256), batch_size=32)
-        
-        pred_values = self.model.predict_generator(generator=generator)
+
+        a_generator=datagen.flow_from_dataframe(dataframe=df, directory=img_folder_path, 
+                                                    x_col="file_name", y_col=['score', 'std'],
+                                                    class_mode="other", target_size=(self.dim, self.dim), batch_size=1)
+
+        pred_values = self.model.predict_generator(generator=a_generator, steps=len(df))
         
         return pred_values[:, 0], pred_values[:, 1]
             
