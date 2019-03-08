@@ -10,10 +10,16 @@ class Model:
         """
         Constructor for a model that initializes parameters by reading the config file
         """
-        self.dir_name = None
-        self.img_class = None
-        self.dim = None
         raise Exception('Not Implemented')
+        
+    def _configure(self, img_class, dir_path, feature, dim):
+        """
+        This function should be called at the beginning of the init func of every subclass of this model
+        """
+        self.img_class = img_class
+        self.dir_path = dir_path
+        self.feature = feature
+        self.dim = dim
     
     
     def load(self, version_name='default'):
@@ -33,36 +39,38 @@ class Model:
     
     def predict(self, df):
         """
-        :return: the predicted normalized scores and normalized stds
+        Returns the predicted values. Type is based on its feature
         """
         raise Exception('Not Implemented')
         
         
-    def version_path(self, name):
-        return 'models/{}/versions/{}/'.format(self.dir_name, name)
+    def _version_path(self, name):
+        return '{}/versions/{}/'.format(self.dir_path, name)
     
-    def model_data_path(self, name):
-        return self.version_path(name) + '/model_data/'
+    def _weight_path(self, vers_name):
+        return self.version_path(vers_name) + '/weights/'
     
-    def checkpoint(self, name=None):
+    def _stats_path(self, vers_name):
+        return self.version_path(vers_name) + '/stats/'
+    
+    def create_version(self, name='default'):
         """
-        Evaluate the model with testing data, save the model to version history,
-        and save the stats of this evaluation into the stats folder of that model.
+        • Saves the model
+        • Evaluates the model from the testing data and saves the results
         :param version: index of the version to save to, or None to create a new version
         :return : version index
         """
-        print("Creating checkpoint...")
+        print("Creating version {}...".format(name))
         
         df = pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
         test_df = df[df['subset'] == 'test']
         test_df = self._clean_df(test_df)
         
-        test_scores = test_df['score']
-        test_stds = test_df['std']
+        true_values = test_df[self.feature]
         
-        pred_scores, pred_stds = self.predict(test_df)
+        pred_values = self.predict(test_df)
         
-        name = 'default' if name is None else name
+        
         
         # Save the statistics as a graph into stats folder
         plt.figure(figsize=(10, 5))
@@ -112,6 +120,9 @@ class Model:
         raise Exception('Not implemented')
     
     def _clean_df(self, df):
+        """
+        Drops the rows of images that do not exist in the processed module
+        """
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
         bad_row_idcs = []
         for i, row in df.iterrows():
