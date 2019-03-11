@@ -1,2 +1,3 @@
 dim: 256
 img_class: small_generic
+feature: 'norm_score'

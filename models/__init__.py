@@ -4,6 +4,11 @@ import os
 import numpy as np
 import skimage.io
 from scipy.stats.stats import pearsonr
+from sklearn import metrics
+from processed_data import features
+from models import utils
+import yaml
+    
 
 class Model:
     def __init__(self):
@@ -12,15 +17,24 @@ class Model:
         """
         raise Exception('Not Implemented')
         
-    def _configure(self, img_class, dir_path, feature, dim):
-        """
-        This function should be called at the beginning of the init func of every subclass of this model
-        """
-        self.img_class = img_class
-        self.dir_path = dir_path
-        self.feature = feature
-        self.dim = dim
     
+    def _configure(self, dir_name):
+        """
+        This function should after the dir_name property has been initialized in the beginning of every
+        init func of every subclass of this model
+        """
+        stream = open("models/{}/config.yml".format(dir_name), "r")
+        config = yaml.load(stream)
+        
+        self.dim = int(config['dim'])
+        self.img_class = config['img_class']
+        
+        self.feature = config['feature']
+        self.dir_name = dir_name
+    
+    @property
+    def df(self):
+        return pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
     
     def load(self, version_name='default'):
         """
@@ -45,13 +59,13 @@ class Model:
         
         
     def _version_path(self, name):
-        return '{}/versions/{}/'.format(self.dir_path, name)
+        return 'models/{}/versions/{}/'.format(self.dir_name, name)
     
     def _weight_path(self, vers_name):
-        return self.version_path(vers_name) + '/weights/'
+        return self._version_path(vers_name) + '/weights/'
     
     def _stats_path(self, vers_name):
-        return self.version_path(vers_name) + '/stats/'
+        return self._version_path(vers_name) + '/stats/'
     
     def create_version(self, name='default'):
         """
@@ -60,9 +74,9 @@ class Model:
         :param version: index of the version to save to, or None to create a new version
         :return : version index
         """
-        print("Creating version {}...".format(name))
+        print("Creating version \'{}\' ...".format(name))
         
-        df = pd.read_csv('processed_data/{}/df.csv'.format(self.img_class))
+        df = self.df
         test_df = df[df['subset'] == 'test']
         test_df = self._clean_df(test_df)
         
@@ -70,43 +84,42 @@ class Model:
         
         pred_values = self.predict(test_df)
         
-        
-        
         # Save the statistics as a graph into stats folder
-        plt.figure(figsize=(10, 5))
-        
-        score_corr = pearsonr(pred_scores, test_scores)[0]
-        std_corr = pearsonr(pred_stds, test_stds)[0]
-        
-        print('Score Corr: {} | STD Corr: {}'.format(score_corr, std_corr))
-        
-        plt.subplot(1, 2, 1)
-        plt.title('Scores with correlation {}'.format(round(score_corr, 3)))
-        plt.xlabel('Predicted')
-        plt.ylabel('Truth')
-        plt.scatter(pred_scores, test_scores)
-        
-        plt.subplot(1, 2, 2)
-        plt.title('STDs with correlation {}'.format(round(std_corr,3)))
-        plt.xlabel('Predicted')
-        plt.ylabel('Truth')
-        plt.scatter(pred_stds, test_stds)
-        
-        stats_path = self.version_path(name) + '/stats/'.format(self.dir_name, name)
+        stats_path = self._version_path(name) + '/stats/'.format(self.dir_name, name)
         if not os.path.exists(stats_path):
             os.makedirs(stats_path)
+            
+        plt.figure()
+        if features.d_type(self.feature) == features.LabelType.CATEGORICAL:
+            # Categorical
+            acc = metrics.accuracy_score(true_values, pred_values)
+            title = 'Accuracy: {}'.format(round(acc, 3))
+            utils.plot_confusion_matrix(true_values, pred_values, ['Ugly', 'Beautiful'], title=title)
+        else:
+            assert features.d_type(self.feature) == features.LabelType.CONTINUOUS
+            # Continuous
+            corr, _ = pearsonr(true_values, pred_values)
+
+            title = 'Correlation: {}'.format(round(corr, 3))
+            print(title)
+
+            plt.title(title)
+            plt.xlabel('Truth')
+            plt.ylabel('Predicted')
+            plt.scatter(true_values, pred_values)
+            
         plt.savefig(stats_path + 'stats.png')
         
         # Save the model into this name folder
         print('Saving model...')
-        output_path = self.version_path(name)
-        output_path += '/model_data/'
+        output_path = self._version_path(name)
+        output_path += '/weights/'
         if not os.path.exists(output_path):
             os.makedirs(output_path)
             
         self._save(output_path)
         
-        print('Saved {} to version {}'.format(self.__class__.__name__, name))
+        print('Saved {} to version \'{}\''.format(self.__class__.__name__, name))
 
     
     
@@ -147,6 +160,9 @@ class Model:
         img_folder_path = "processed_data/image_pool/{0}_{0}/".format(self.dim)
         img_paths = list(map(lambda id: img_folder_path + str(id) + ".png", df["id"].values))
         list_of_images = list(skimage.io.imread_collection(img_paths))
-        return list_of_images, df['norm_score'], df['norm_std']
-    
+        return list_of_images, df[self.feature]
+
+
+class KerasModel(Model):
+    pass
     

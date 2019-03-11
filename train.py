@@ -1,8 +1,9 @@
-from models.densenet import DenseNet
+
 from models.vector_quantization import VQModel
+from models.demo import Linear
 import argparse
 
-available_models = list(map(lambda model: model.__name__, [DenseNet, VQModel]))
+available_models = list(map(lambda model: model.__name__, [VQModel, Linear]))
 
 # Parse arguments
 parser = argparse.ArgumentParser(description='Train the model')
@@ -28,4 +29,4 @@ if not skip_train:
     model.train(epochs)
 else:
     print('Skipped training...')
-model.checkpoint(vers_name)
+model.create_version(vers_name)
