@@ -1,9 +1,9 @@
-
+from models.densenet import DenseNet
 from models.vector_quantization import VQModel
 from models.demo import Linear
 import argparse
 
-available_models = list(map(lambda model: model.__name__, [VQModel, Linear]))
+available_models = list(map(lambda model: model.__name__, [DenseNet, VQModel, Linear]))
 
 # Parse arguments
 parser = argparse.ArgumentParser(description='Train the model')

@@ -1,2 +1,3 @@
 dim: 256
-img_class: generic
+img_class: portraits
+feature: norm_score
