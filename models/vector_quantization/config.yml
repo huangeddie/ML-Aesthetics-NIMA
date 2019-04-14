@@ -1,4 +1,0 @@
-dim: 256
-img_class: portraits
-num_of_cluster: 32
-num_chunk_per_side: 32
