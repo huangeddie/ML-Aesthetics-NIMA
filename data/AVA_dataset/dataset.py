@@ -18,7 +18,7 @@ class AVA(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = self.df.iloc[idx]
         img_id = item['Image ID']
-        img = Image.open('data/AVA_dataset/images/all_images/{}.jpg'.format(img_id)).convert('RGB')
+        img = Image.open('data/AVA_dataset/images/{}.jpg'.format(img_id)).convert('RGB')
         
         if self.transform is not None:
             img = self.transform(img)
