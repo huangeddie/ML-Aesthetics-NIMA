@@ -1,6 +1,6 @@
 import torch.utils.data
 import pandas as pd
-from skimage import io
+from PIL import Image
 from torchvision import transforms
 
 class AVA(torch.utils.data.Dataset):
@@ -18,14 +18,10 @@ class AVA(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = self.df.iloc[idx]
         img_id = item['Image ID']
-        img = io.imread('data/AVA_dataset/images/all_images/{}.jpg'.format(img_id))
-        
-        
+        img = Image.open('data/AVA_dataset/images/all_images/{}.jpg'.format(img_id)).convert('RGB')
         
         if self.transform is not None:
             img = self.transform(img)
-            
-        img = transforms.ToTensor()(img)
         
-        return img, item[[1,2,3,4,5,6,7,8,9,10]]
+        return img, item[[1,2,3,4,5,6,7,8,9,10]].values
         

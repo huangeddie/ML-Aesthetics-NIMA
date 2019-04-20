@@ -8,10 +8,10 @@ class Classifier(nn.Module):
         self.input_size = input_size
         
         self.main = nn.Sequential(
-            nn.Linear(input_size ** 2, num_classes),
+            nn.Linear(3 * (input_size ** 2), num_classes),
             nn.Softmax(1)
         )
         
     def forward(self, img):
-        out = self.main(img.view(-1, self.input_size ** 2))
+        out = self.main(img.view(-1, 3 * (self.input_size ** 2)))
         return out
