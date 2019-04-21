@@ -1,7 +1,7 @@
-import torch.utils.data
 import pandas as pd
 from PIL import Image
 from torchvision import transforms
+import torch
 
 class AVA(torch.utils.data.Dataset):
     def __init__(self, aesthetic_path, transform=None):
@@ -23,5 +23,9 @@ class AVA(torch.utils.data.Dataset):
         if self.transform is not None:
             img = self.transform(img)
         
-        return img, item[[1,2,3,4,5,6,7,8,9,10]].values
+        prob_distr = item[[1,2,3,4,5,6,7,8,9,10]].values
+        prob_distr = prob_distr / prob_distr.sum()
+        prob_distr = torch.from_numpy(prob_distr).float()
+        
+        return img, prob_distr
         
