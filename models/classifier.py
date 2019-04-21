@@ -22,7 +22,11 @@ class Classifier(nn.Module):
             nn.BatchNorm2d(256),
             nn.ReLU(),
         )
-        self.linear = nn.Linear(256 * 8 * 8, num_classes)
+        self.linear = nn.Sequential(
+            nn.Linear(256 * 8 * 8, num_classes),
+            nn.Softmax(1)
+        )
+        
         
     def forward(self, img):
         out = self.convs(img)
