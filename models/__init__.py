@@ -1,1 +1,2 @@
 from models.classifier import Classifier
+from models.simple_classifier import SimpleClassifier

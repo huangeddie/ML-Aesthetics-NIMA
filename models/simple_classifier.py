@@ -12,5 +12,5 @@ class SimpleClassifier(nn.Module):
         
         
     def forward(self, img):
-        out = self.linear(img)
+        out = self.linear(img.view(-1, (256 ** 2) * 3))
         return out
