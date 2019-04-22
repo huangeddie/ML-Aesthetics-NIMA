@@ -7,8 +7,10 @@ class AVA(torch.utils.data.Dataset):
     def __init__(self, aesthetic_path, transform=None):
         super().__init__()
         self.df = pd.read_csv('data/AVA_dataset/proc_AVA.csv')
-        self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
-        self.df = self.df.merge(self.aesth_df)
+        
+        if aesthetic_path is not None:
+            self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
+            self.df = self.df.merge(self.aesth_df)
         
         self.transform = transform
         
@@ -18,7 +20,7 @@ class AVA(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = self.df.iloc[idx]
         img_id = item['Image ID']
-        img = Image.open('data/AVA_dataset/images/{}.jpg'.format(img_id)).convert('RGB')
+        img = Image.open('data/AVA_dataset/images/{}.jpg'.format(int(img_id))).convert('RGB')
         
         if self.transform is not None:
             img = self.transform(img)
@@ -30,11 +32,15 @@ class AVA(torch.utils.data.Dataset):
         return img, prob_distr
         
 class BinaryAVA(torch.utils.data.Dataset):
-    def __init__(self, aesthetic_path, transform=None):
+    def __init__(self, aesthetic_path=None, transform=None):
         super().__init__()
         self.df = pd.read_csv('data/AVA_dataset/proc_AVA.csv')
-        self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
-        self.df = self.df.merge(self.aesth_df)
+        
+        if aesthetic_path is not None:
+            self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
+            self.df = self.df.merge(self.aesth_df)
+        
+        top_10_perc_size = int(len(self.df) * 0.1)
         
         beautiful_df = self.df.nlargest(top_10_perc_size, 'Mean Score')
         beautiful_df['Beautiful'] = 1
@@ -52,9 +58,9 @@ class BinaryAVA(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         item = self.df.iloc[idx]
         img_id = item['Image ID']
-        img = Image.open('data/AVA_dataset/images/{}.jpg'.format(img_id)).convert('RGB')
+        img = Image.open('data/AVA_dataset/images/{}.jpg'.format(int(img_id))).convert('RGB')
         
         if self.transform is not None:
             img = self.transform(img)
         
-        return img, item['Beautiful']
+        return img, item['Beautiful'].astype(float)

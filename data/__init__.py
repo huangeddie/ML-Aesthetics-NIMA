@@ -1,1 +1,1 @@
-from data.AVA_dataset.dataset import AVA
+from data.AVA_dataset.dataset import AVA, BinaryAVA
