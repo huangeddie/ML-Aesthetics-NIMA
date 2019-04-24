@@ -1,2 +1,2 @@
-from models.classifier import Classifier
-from models.simple_classifier import SimpleClassifier
+from models.conv_class import ConvClass
+from models.simple_class import SimpleClass
