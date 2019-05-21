@@ -27,7 +27,7 @@ class AVA(torch.utils.data.Dataset):
         
         prob_distr = item[[1,2,3,4,5,6,7,8,9,10]].values
         prob_distr = prob_distr / prob_distr.sum()
-        prob_distr = torch.from_numpy(prob_distr).float().log()
+        prob_distr = torch.from_numpy(prob_distr).float()
         
         return img, prob_distr
         
