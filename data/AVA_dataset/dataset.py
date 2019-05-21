@@ -31,7 +31,7 @@ class AVA(torch.utils.data.Dataset):
         
         return img, prob_distr
         
-class BinaryAVA(torch.utils.data.Dataset):
+class AVA2(torch.utils.data.Dataset):
     def __init__(self, aesthetic_path=None, transform=None):
         super().__init__()
         self.df = pd.read_csv('data/AVA_dataset/proc_AVA.csv')
