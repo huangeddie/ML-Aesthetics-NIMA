@@ -4,9 +4,10 @@ from torchvision import transforms
 import torch
 
 class AVA(torch.utils.data.Dataset):
-    def __init__(self, aesthetic_path, transform=None):
+    def __init__(self, aesthetic_path, train, transform=None):
         super().__init__()
         self.df = pd.read_csv('data/AVA_dataset/proc_AVA.csv')
+        self.df = self.df[self.df['Train'] == train]
         
         if aesthetic_path is not None:
             self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
@@ -25,16 +26,17 @@ class AVA(torch.utils.data.Dataset):
         if self.transform is not None:
             img = self.transform(img)
         
-        prob_distr = item[[1,2,3,4,5,6,7,8,9,10]].values
-        prob_distr = torch.from_numpy(prob_distr)
-        prob_distr = torch.nn.functional.softmax(prob_distr,dim=0,dtype=torch.float)
+        prob_distr = item[[1,2,3,4,5,6,7,8,9,10]].astype(int).values
+        prob_distr = prob_distr / prob_distr.sum()
+        prob_distr = torch.from_numpy(prob_distr).float()
         
         return img, prob_distr
         
 class AVA2(torch.utils.data.Dataset):
-    def __init__(self, aesthetic_path=None, transform=None):
+    def __init__(self, aesthetic_path, train, transform=None):
         super().__init__()
         self.df = pd.read_csv('data/AVA_dataset/proc_AVA.csv')
+        self.df = self.df[self.df['Train'] == train]
         
         if aesthetic_path is not None:
             self.aesth_df = pd.read_csv(aesthetic_path, names=['Image ID'])
