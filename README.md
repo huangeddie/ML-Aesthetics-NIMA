@@ -20,7 +20,7 @@ Standard Deviation
 This model is also hosted on [my website](https://www.aigagror.com/research/ml_aesthetics/), where you can upload images to get aesthetic feedback
 
 # About
-This project is an implementation of the [Neural Image Assessment paper](https://arxiv.org/abs/1709.05424). While the paper uses models Inception-v2, MobileNet, and VGG16, this project uses DenseNet121. Not only does DenseNet in general have a higher accuracy rating on than any of the other models, but it also has fewer parameters. This makes not only training significantly faster, but using it  computationally more efficient.
+This project is an implementation of the [Neural Image Assessment paper](https://arxiv.org/abs/1709.05424). While the paper uses models Inception-v2, MobileNet, and VGG16, this project uses DenseNet121. Not only does DenseNet in general have a higher accuracy rating than any of the other models, it also has fewer parameters. This makes not only training significantly faster, but using it computationally more efficient.
 
 Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](https://ieeexplore.ieee.org/document/6247954) dataset, which is a dataset of over 250 thousand images, where each image was rated aesthetically on a scale of 1-10 by around 200 amateur photographers. We call AVA2 the set of images that are in the top 10% or lowest 10% of AVA by the mean rating and label them as "beautiful" or "ugly" respectively. In the second column, accuracy, of the table below, was calculated by using the mean score 0.5 as a threshold for "beautiful" and "ugly"
 
