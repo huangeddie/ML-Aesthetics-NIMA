@@ -1,6 +1,3 @@
-# Goal
-Create a machine learning model to accurately rate the aesthetics of images
-
 # Example Usage
 ```
 python main.py images/dog.jpg
