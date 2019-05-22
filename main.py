@@ -5,6 +5,7 @@ from torchvision import models
 from torchvision import transforms
 from PIL import Image
 import os
+import numpy as np
 
 def rate(img_path):
     """
@@ -24,11 +25,9 @@ def rate(img_path):
     weight_path = 'weights/dense121_all.pt'
 
     # Load weights
-    if os.path.exists(weight_path):
-        model_ft.load_state_dict(torch.load(weight_path))
-        print("Loaded saved weights from '{}'".format(weight_path))
-    else:
-        print("Starting weights from scratch")
+    assert os.path.exists(weight_path)
+    model_ft.load_state_dict(torch.load(weight_path))
+
 
     img = Image.open(img_path)
     transform = transforms.Compose([
@@ -43,7 +42,7 @@ def rate(img_path):
         weighted_votes = torch.arange(10, dtype=torch.float) + 1
         mean = torch.matmul(scores, weighted_votes)
         std = torch.sqrt((scores * torch.pow((weighted_votes - mean.view(-1,1)), 2)).sum(dim=1))
-    return scores.numpy(), mean.item(), std.item()
+    return scores.view(-1).numpy(), mean.item(), std.item()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Use DenseNet NIMA')
@@ -53,4 +52,11 @@ if __name__ == '__main__':
 
     img_path = args.img_path
     scores, mean, std = rate(img_path)
-    print(scores, mean, std)
+    
+    print()
+    print("Probability distribution of 1-10 rating scale")
+    print(np.around(scores, decimals=3))
+    print()
+    print("Mean score\n{:.3f}".format(mean))
+    print()
+    print("Standard Deviation\n{:.3f}".format(std))
