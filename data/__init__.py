@@ -1,1 +1,1 @@
-from data.AVA_dataset.dataset import AVA, AVA2
+from data.AVA_dataset.dataset import AVA, AVA2, AVA_ID
