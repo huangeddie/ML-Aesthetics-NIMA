@@ -24,7 +24,7 @@ This project is an implementation of the [Neural Image Assessment paper](https:/
 
 Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](https://ieeexplore.ieee.org/document/6247954) dataset, which is a dataset of over 250 thousand images, where each image was rated aesthetically on a scale of 1-10 by around 200 amateur photographers. We call AVA2 the set of images that are in the top 10% or lowest 10% of AVA by the mean rating and label them as "beautiful" or "ugly" respectively. In the second column, accuracy, of the table below, was calculated by using the mean score 0.5 as a threshold for "beautiful" and "ugly"
 
-![Correlations of DenseNet](figures/densenet_corr.png)
+![Correlations of DenseNet](https://www.aigagror.com/static/research/densenet_corr.png)
 
 | Model              | Parameters | Accuracy (AVA2) | LLC (mean)    | SRCC (mean)   | LLC (std) | SRCC (std) | EMD           |
 | ------------------ | ---------- | --------------- | ------------- | ------------- | --------- | ---------- | ------------- | 
