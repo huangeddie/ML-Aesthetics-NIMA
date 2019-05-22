@@ -4,11 +4,11 @@ Create a machine learning model to accurately rate the aesthetics of images
 # Example Usage
 ```
 python main.py images/dog.jpg
-
+```
+```
 Probability distribution of 1-10 rating scale
 [0.005 0.017 0.048 0.155 0.326 0.261 0.114 0.049 0.017 0.009]
-```
-```
+
 Mean score
 5.422
 
