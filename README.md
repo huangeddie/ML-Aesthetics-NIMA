@@ -26,12 +26,12 @@ Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](ht
 
 ![Correlations of DenseNet](figures/densenet_corr.png)
 
-| Model              | Accuracy (AVA2) | LLC (mean)    | SRCC (mean)   | LLC (std)     | SRCC (std)    | EMD           |
-| ------------------ | --------------- | ------------- | ------------- | ------------- | ------------- | ------------- | 
-| NIMA(MobileNet)    | 80.36%          | 0.518         | 0.510         | 0.152         | 0.137         | 0.081         |
-| NIMA(VGG16)        | 80.60%          | 0.610         | 0.592         | 0.205         | 0.202         | 0.051         |
-| NIMA(Inception-v2) | 81.51%          | 0.638         | 0.612         | 0.233         | 0.218         | 0.050         |
-| NIMA(DenseNet121)  | **82.87%**      | **0.648**     | **0.634**     | **0.287**     | **0.270**     | 0.083         |
+| Model              | Parameters | Accuracy (AVA2) | LLC (mean)    | SRCC (mean)   | LLC (std) | SRCC (std) | EMD           |
+| ------------------ | ---------- | --------------- | ------------- | ------------- | --------- | ---------- | ------------- | 
+| NIMA(MobileNet)    | 4M         | 80.36%          | 0.518         | 0.510         | 0.152     | 0.137      | 0.081         |
+| NIMA(VGG16)        | 138M       | 80.60%          | 0.610         | 0.592         | 0.205     | 0.202      | 0.051         |
+| NIMA(Inception-v2) | 24M        | 81.51%          | 0.638         | 0.612         | 0.233     | 0.218      | 0.050         |
+| NIMA(DenseNet121)  | **8M**     | **82.87%**      | **0.648**     | **0.634**     | **0.287** | **0.270**  | 0.083         |
 
 *I found it unusual that my EMD loss was higher than all the others despite the correlations and accuracy on AVA2 being so high. My theory is that the researchers ignored the squareroot in their formulation for the EMD loss function, which could account for the difference*
 
@@ -39,4 +39,4 @@ Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](ht
 ### Acknowledgements
 * [AVA Dataset: Aesthetic Visual Analysis](https://ieeexplore.ieee.org/document/6247954)
 * [NIMA: Neural Image Assessment](https://arxiv.org/abs/1709.05424)
-* [Visual aesthetic analysis using deep neural network: model and techniques to increase accuracy without transfer learning](https://arxiv.org/abs/1712.03382v1)
+* [Densely Connected Convolutional Networks](https://arxiv.org/abs/1608.06993)
