@@ -1,20 +1,7 @@
-# Example Usage
-```
-python main.py images/dog.jpg
-```
-```
-Probability distribution of 1-10 rating scale
-[0.005 0.017 0.048 0.155 0.326 0.261 0.114 0.049 0.017 0.009]
-
-Mean score
-5.422
-
-Standard Deviation
-1.431
-```
-
 # About
 This project is an implementation of the [Neural Image Assessment paper](https://arxiv.org/abs/1709.05424). While the paper uses models Inception-v2, MobileNet, and VGG16, this project uses DenseNet121. Not only does DenseNet in general have a higher accuracy rating than any of the other models, it also has fewer parameters. This makes not only training significantly faster, but using it computationally more efficient.
+
+![Correlations of DenseNet](https://www.aigagror.com/static/research/ava_examples.png)
 
 Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](https://ieeexplore.ieee.org/document/6247954) dataset, which is a dataset of over 250 thousand images, where each image was rated aesthetically on a scale of 1-10 by around 200 amateur photographers. We call AVA2 the set of images that are in the top 10% or lowest 10% of AVA by the mean rating and label them as "beautiful" or "ugly" respectively. In the second column, accuracy, of the table below, was calculated by using the mean score 0.5 as a threshold for "beautiful" and "ugly"
 
@@ -29,6 +16,20 @@ Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](ht
 
 *I found it unusual that my EMD loss was higher than all the others despite the correlations and accuracy on AVA2 being so high. My theory is that the researchers ignored the squareroot in their formulation for the EMD loss function, which could account for the difference*
 
+# Example Usage
+```
+python main.py images/dog.jpg
+```
+```
+Probability distribution of 1-10 rating scale
+[0.005 0.017 0.048 0.155 0.326 0.261 0.114 0.049 0.017 0.009]
+
+Mean score
+5.422
+
+Standard Deviation
+1.431
+```
 
 ### Acknowledgements
 * [AVA Dataset: Aesthetic Visual Analysis](https://ieeexplore.ieee.org/document/6247954)
