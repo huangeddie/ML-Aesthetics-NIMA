@@ -1,11 +1,12 @@
 import argparse
-import torch
-from torch import nn
-from torchvision import models
-from torchvision import transforms
-from PIL import Image
 import os
+
 import numpy as np
+import torch
+from PIL import Image
+from torch import nn
+from torchvision import models, transforms
+
 
 def rate(img_path):
     """
@@ -17,7 +18,7 @@ def rate(img_path):
     model_ft = models.densenet121(pretrained=True)
     num_ftrs = model_ft.classifier.in_features
     model_ft.classifier = nn.Sequential(
-        nn.Linear(num_ftrs,num_classes),
+        nn.Linear(num_ftrs, num_classes),
         nn.Softmax(1)
     )
 
@@ -28,21 +29,22 @@ def rate(img_path):
     assert os.path.exists(weight_path)
     model_ft.load_state_dict(torch.load(weight_path))
 
-
     img = Image.open(img_path)
     transform = transforms.Compose([
-            transforms.Resize(224),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-        ])
+        transforms.Resize(224),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+    ])
     img = transform(img)
 
     with torch.no_grad():
-        scores = model_ft(img.view(1,3,224,224))
+        scores = model_ft(img.view(1, 3, 224, 224))
         weighted_votes = torch.arange(10, dtype=torch.float) + 1
         mean = torch.matmul(scores, weighted_votes)
-        std = torch.sqrt((scores * torch.pow((weighted_votes - mean.view(-1,1)), 2)).sum(dim=1))
+        std = torch.sqrt(
+            (scores * torch.pow((weighted_votes - mean.view(-1, 1)), 2)).sum(dim=1))
     return scores.view(-1).numpy(), mean.item(), std.item()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Use DenseNet NIMA')
@@ -52,7 +54,7 @@ if __name__ == '__main__':
 
     img_path = args.img_path
     scores, mean, std = rate(img_path)
-    
+
     print()
     print("Probability distribution of 1-10 rating scale")
     print(np.around(scores, decimals=3))
