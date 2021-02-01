@@ -1,12 +1,11 @@
 import argparse
 import os
-
+import glob
 import numpy as np
 import torch
 from PIL import Image
 from torch import nn
 from torchvision import models, transforms
-
 
 def rate(img_path):
     """
@@ -30,36 +29,31 @@ def rate(img_path):
     model_ft.load_state_dict(torch.load(weight_path))
     model_ft.eval()
 
-    img = Image.open(img_path)
+    image_filenames = sorted(glob.glob(img_path))
+
     transform = transforms.Compose([
         transforms.Resize(224),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
     ])
-    img = transform(img)
 
-    with torch.no_grad():
-        scores = model_ft(img.view(1, 3, 224, 224))
-        weighted_votes = torch.arange(10, dtype=torch.float) + 1
-        mean = torch.matmul(scores, weighted_votes)
-        std = torch.sqrt(
-            (scores * torch.pow((weighted_votes - mean.view(-1, 1)), 2)).sum(dim=1))
-    return scores.view(-1).numpy(), mean.item(), std.item()
+    for index, filename in enumerate(image_filenames):
+        img = Image.open(filename).convert('RGB')
+        img = transform(img)
+
+        with torch.no_grad():
+            scores = model_ft(img.view(1, 3, 224, 224))
+            weighted_votes = torch.arange(10, dtype=torch.float) + 1
+            mean = torch.matmul(scores, weighted_votes)
+            std = torch.sqrt((scores * torch.pow((weighted_votes - mean.view(-1, 1)), 2)).sum(dim=1))
+
+        print("{:.4f} {:.4f}--- {}".format(mean.item(), std.item(), filename))
+   
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Use DenseNet NIMA')
 
-    parser.add_argument('img_path', type=str, help='Path to input image')
+    parser.add_argument('--img_path', type=str, default="images/*", help='Path to input image')
     args = parser.parse_args()
-
-    img_path = args.img_path
-    scores, mean, std = rate(img_path)
-
-    print()
-    print("Probability distribution of 1-10 rating scale")
-    print(np.around(scores, decimals=3))
-    print()
-    print("Mean score\n{:.3f}".format(mean))
-    print()
-    print("Standard Deviation\n{:.3f}".format(std))
+    rate(args.img_path)
