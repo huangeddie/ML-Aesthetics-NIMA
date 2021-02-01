@@ -15,7 +15,7 @@ def rate(img_path):
     # Number of classes in the dataset
     num_classes = 10
 
-    model_ft = models.densenet121(pretrained=True)
+    model_ft = models.densenet121(pretrained=False)
     num_ftrs = model_ft.classifier.in_features
     model_ft.classifier = nn.Sequential(
         nn.Linear(num_ftrs, num_classes),
@@ -28,6 +28,7 @@ def rate(img_path):
     # Load weights
     assert os.path.exists(weight_path)
     model_ft.load_state_dict(torch.load(weight_path))
+    model_ft.eval()
 
     img = Image.open(img_path)
     transform = transforms.Compose([
