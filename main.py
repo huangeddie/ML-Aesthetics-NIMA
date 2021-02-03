@@ -3,8 +3,7 @@ import os
 import glob
 import torch
 from PIL import Image
-# from torch import nn
-from torchvision import models, transforms
+from torchvision import transforms
 from model import model_setenv, get_model, model_load, model_device
 import pdb
 
@@ -12,24 +11,6 @@ def rate(img_path):
     """
     Returns: Scores, mean, std
     """
-    # # Number of classes in the dataset
-    # num_classes = 10
-
-    # model_ft = models.densenet121(pretrained=False)
-    # num_ftrs = model_ft.classifier.in_features
-    # model_ft.classifier = nn.Sequential(
-    #     nn.Linear(num_ftrs, num_classes),
-    #     nn.Softmax(1)
-    # )
-
-    # # Weight Path
-    # weight_path = 'weights/dense121_all.pt'
-
-    # # Load weights
-    # assert os.path.exists(weight_path)
-    # model_ft.load_state_dict(torch.load(weight_path))
-    # model_ft.eval()
-
     model_setenv()
     device = model_device()
     model = get_model()
