@@ -15,7 +15,7 @@ import pdb
 
 import torch
 import torch.nn as nn
-from torchvision import models, transforms
+from torchvision import models
 
 def model_load(model, path):
     """Load model."""
@@ -93,7 +93,7 @@ def export_onnx_model():
 
     np.testing.assert_allclose(to_numpy(torch_output), onnxruntime_outputs[0], rtol=1e-03, atol=1e-03)
 
-    print("Exported model has been tested with ONNXRuntime, the result looks good!")
+    print("Onnx model has been tested with ONNXRuntime, Result looks good!")
 
     # 5. Visual model
     # python -c "import netron; netron.start('output/image_fill.onnx')"
@@ -163,9 +163,9 @@ def model_setenv():
 if __name__ == '__main__':
     """Test model ..."""
 
-    model = get_model()
-    print(model)
+    # model = get_model()
+    # print(model)
 
-    export_torch_model()
+    # export_torch_model()
     export_onnx_model()
 
