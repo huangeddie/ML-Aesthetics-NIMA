@@ -98,28 +98,6 @@ def export_onnx_model():
     # 5. Visual model
     # python -c "import netron; netron.start('output/image_fill.onnx')"
 
-
-def export_torch_model():
-    """Export torch model."""
-
-    script_file = "output/image_nima.pt"
-    weight_file = "models/ImageNima.pth"
-    if not os.path.exists("output"):
-        os.makedirs("output")    
-
-    # 1. Load model
-    print("Loading model ...")
-    model = get_model()
-    model_load(model, weight_file)
-    model.eval()
-
-    # 2. Model export
-    print("Export model ...")
-    dummy_input = torch.randn(1, 3, 224, 224)
-    traced_script_module = torch.jit.trace(model, dummy_input)
-    traced_script_module.save(script_file)
-
-
 def get_model():
     """Create model."""
     model_setenv()
@@ -166,6 +144,5 @@ if __name__ == '__main__':
     # model = get_model()
     # print(model)
 
-    # export_torch_model()
     export_onnx_model()
 
