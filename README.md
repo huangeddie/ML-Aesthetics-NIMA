@@ -16,6 +16,13 @@ Like in NIMA, DenseNet was finetuned on the [Aesthetic Visual Analysis (AVA)](ht
 
 *I found it unusual that my EMD loss was higher than all the others despite the correlations and accuracy on AVA2 being so high. My theory is that the researchers ignored the squareroot in their formulation for the EMD loss function, which could account for the difference*
 
+# Dependencies
+Run these commands to install the dependencies
+```
+pip3 install torch
+pip3 install torchvision 
+```
+
 # Example Usage
 ```
 python main.py images/dog.jpg
